@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -37,8 +36,3 @@ class TimeStamps(models.Model):
     description = models.TextField(
         verbose_name='Описание', max_length=350,
         blank=True, null=True)
-
-    def clean(self):
-        if self.status not in self.STATUSES:
-            raise ValidationError('Указано недопустимое значение статуса')
-        return super().clean()
