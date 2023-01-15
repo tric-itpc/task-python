@@ -24,7 +24,8 @@ def time_filter(queryset, request):
 def shifts_filter(queryset, request):
     params = request.GET
     if not params.get('shifts_only') or (
-            params.get('shifts_only').lower() == 'false'):
+            params.get('shifts_only').lower() == 'false' or 
+            '/sla' in request.path):
         return queryset
 
     shifts_ids = [queryset[0].id, ]
