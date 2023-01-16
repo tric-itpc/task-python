@@ -1,9 +1,11 @@
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from .filters import time_filter, shifts_filter
 from .models import Services, TimeStamps
+from .permissions import IsAdminOrStaff
 from .serializer import (
     TimeStampsSerializer,
     ServiceInfoSerializer,
@@ -16,7 +18,7 @@ class TimeStampsViewSet(ModelViewSet):
     serializer_class = TimeStampsSerializer
     queryset = TimeStamps.objects.all()
     pagination_class = None
-    permission_classes = []
+    permission_classes = [IsAuthenticated, IsAdminOrStaff]
     cust_filters = [time_filter, shifts_filter]
 
     def get_queryset(self):
@@ -43,14 +45,14 @@ class ServicesInfoViewSet(ModelViewSet):
     serializer_class = ServiceInfoSerializer
     queryset = Services.objects.all()
     pagination_class = None
-    permission_classes = []
+    permission_classes = [IsAuthenticated, IsAdminOrStaff]
 
 
 class StatusSaveViewSet(ModelViewSet):
 
     serializer_class = StatusSaveSerializer
     pagination_class = None
-    permission_classes = []
+    permission_classes = [IsAuthenticated, IsAdminOrStaff]
 
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
