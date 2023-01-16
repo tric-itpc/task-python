@@ -2,7 +2,6 @@ from django.urls import path
 
 from .views import ServicesInfoViewSet, StatusSaveViewSet, TimeStampsViewSet
 
-
 urlpatterns = [
     path('info/all', ServicesInfoViewSet.as_view({'get': 'list'}),
          name='all_services'),

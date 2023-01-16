@@ -3,7 +3,6 @@ from djoser.serializers import UserSerializer
 from djoser.views import UserViewSet
 from rest_framework import pagination, permissions
 
-
 User = get_user_model()
 
 

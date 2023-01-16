@@ -1,4 +1,5 @@
 from datetime import timedelta
+
 from rest_framework import serializers
 
 from .models import Services, TimeStamps
@@ -43,9 +44,9 @@ class ServiceSlaSerializer(serializers.Serializer):
                     time_stamp = None
 
         if work_time == 0:
-            return 0
-
-        return round(work_time/full_time, 3)
+            return '0.000 %'
+        sla = round(work_time/full_time * 100, 3)
+        return f'{sla} %'
 
 
 class ServiceInfoSerializer(serializers.ModelSerializer):

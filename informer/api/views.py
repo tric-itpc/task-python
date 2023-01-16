@@ -3,14 +3,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from .filters import time_filter, shifts_filter
+from .filters import shifts_filter, time_filter
 from .models import Services, TimeStamps
 from .permissions import IsAdminOrStaff
-from .serializer import (
-    TimeStampsSerializer,
-    ServiceInfoSerializer,
-    ServiceSlaSerializer,
-    StatusSaveSerializer)
+from .serializer import ServiceInfoSerializer, ServiceSlaSerializer
+from .serializer import StatusSaveSerializer, TimeStampsSerializer
 
 
 class TimeStampsViewSet(ModelViewSet):
