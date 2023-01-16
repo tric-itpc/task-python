@@ -80,8 +80,18 @@ class ServiceInfoSerializer(serializers.ModelSerializer):
         return last_record.time_stamp
 
 
+class CustSlugRelatedField(serializers.SlugRelatedField):
+    def to_internal_value(self, data):
+        queryset = self.get_queryset()
+        try:
+            res = queryset.get_or_create(**{self.slug_field: data})
+            return res[0]
+        except (TypeError, ValueError):
+            self.fail('invalid')
+
+
 class StatusSaveSerializer(serializers.ModelSerializer):
-    service = serializers.SlugRelatedField(
+    service = CustSlugRelatedField(
         queryset=Services.objects.all(),
         slug_field='name')
 
