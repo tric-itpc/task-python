@@ -1,5 +1,7 @@
+from sqlalchemy import and_, func, select
+
 from db import database
-from models import service
+from models import service, state
 
 
 class ServiceManager:
@@ -28,3 +30,30 @@ class ServiceManager:
         await database.execute(
             service.delete().where(service.c.id == service_id)
         )
+
+    @staticmethod
+    async def get_services_with_states():
+        subq = (
+            select(
+                [
+                    state.c.service_id,
+                    func.max(state.c.created_at).label("created_at"),
+                ]
+            )
+            .group_by(state.c.service_id)
+            .alias("last_state")
+        )
+        q = (
+            select([service, state])
+            .select_from(
+                service.join(state, service.c.id == state.c.service_id).join(
+                    subq,
+                    and_(
+                        subq.c.service_id == state.c.service_id,
+                        subq.c.created_at == state.c.created_at,
+                    ),
+                )
+            )
+            .distinct(state.c.service_id)
+        )
+        return await database.fetch_all(q)

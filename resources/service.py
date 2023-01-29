@@ -6,7 +6,7 @@ from starlette.requests import Request
 from managers.auth import is_admin, is_admin_or_staff, oauth2_scheme
 from managers.service import ServiceManager
 from schemas.request.service import ServiceIn
-from schemas.response.service import ServiceOut
+from schemas.response.service import ServiceAndStateOut, ServiceOut
 
 router = APIRouter(tags=["Services"])
 
@@ -45,3 +45,12 @@ async def update_service(service_id: int, service_data: ServiceIn):
 )
 async def delete_service(service_id: int):
     await ServiceManager.delete_service(service_id)
+
+
+@router.get(
+    "/services/states",
+    dependencies=[Depends(oauth2_scheme), Depends(is_admin_or_staff)],
+    response_model=List[ServiceAndStateOut],
+)
+async def get_services_with_states(request: Request):
+    return await ServiceManager.get_services_with_states()
