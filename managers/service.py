@@ -33,6 +33,7 @@ class ServiceManager:
 
     @staticmethod
     async def get_services_with_states():
+        # Subquery retrieving last state of every service
         subq = (
             select(
                 [
@@ -57,3 +58,16 @@ class ServiceManager:
             .distinct(state.c.service_id)
         )
         return await database.fetch_all(q)
+
+    @staticmethod
+    async def get_service_states_history(service_name, limit: int, offset: int):
+        # Query that finds service by its name
+        wanted_service = service.select().where(service.c.name == service_name)
+        query = (
+            state.select()
+            .where(state.c.service_id == wanted_service.c.id)
+            .order_by(state.c.created_at.desc())
+            .offset(offset)
+            .limit(limit)
+        )
+        return await database.fetch_all(query)

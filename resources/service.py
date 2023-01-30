@@ -1,12 +1,14 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
 from managers.auth import is_admin, is_admin_or_staff, oauth2_scheme
 from managers.service import ServiceManager
 from schemas.request.service import ServiceIn
 from schemas.response.service import ServiceAndStateOut, ServiceOut
+from schemas.response.state import HistoryStateOut
 
 router = APIRouter(tags=["Services"])
 
@@ -54,3 +56,21 @@ async def delete_service(service_id: int):
 )
 async def get_services_with_states(request: Request):
     return await ServiceManager.get_services_with_states()
+
+
+@router.get(
+    "/services/states/{service_name}",
+    dependencies=[Depends(oauth2_scheme), Depends(is_admin_or_staff)],
+    response_model=List[HistoryStateOut],
+)
+async def get_service_states_history(
+    service_name: str, limit: int = 15, offset: int = 0
+):
+    history = await ServiceManager.get_service_states_history(
+        service_name, limit, offset
+    )
+    if not history:
+        return JSONResponse(
+            {"message": "This service does not exist or contains no states."}
+        )
+    return history
