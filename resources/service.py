@@ -2,7 +2,6 @@ from typing import List
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from starlette.requests import Request
 
 from managers.auth import is_admin, is_admin_or_staff, oauth2_scheme
 from managers.service import ServiceManager
@@ -14,20 +13,28 @@ router = APIRouter(tags=["Services"])
 
 
 @router.get(
-    "/services/",
+    "/services",
     dependencies=[Depends(oauth2_scheme), Depends(is_admin_or_staff)],
     response_model=List[ServiceOut],
 )
-async def get_services(request: Request):
+async def get_services():
+    """
+    Outputs a list of all services in the database.
+    For usage your role should be "staff" or "admin".
+    """
     return await ServiceManager.get_services()
 
 
 @router.post(
-    "/services/",
+    "/services",
     dependencies=[Depends(oauth2_scheme), Depends(is_admin)],
     response_model=ServiceOut,
 )
-async def create_service(request: Request, service_data: ServiceIn):
+async def create_service(service_data: ServiceIn):
+    """
+    Adds the service to the database.
+    For usage your role should be "admin".
+    """
     return await ServiceManager.create_service(service_data.dict())
 
 
@@ -37,6 +44,10 @@ async def create_service(request: Request, service_data: ServiceIn):
     status_code=204,
 )
 async def update_service(service_id: int, service_data: ServiceIn):
+    """
+    Changes the service data.
+    For usage your role should be "admin".
+    """
     await ServiceManager.update_service(service_id, service_data.dict())
 
 
@@ -46,6 +57,10 @@ async def update_service(service_id: int, service_data: ServiceIn):
     status_code=204,
 )
 async def delete_service(service_id: int):
+    """
+    Removes the service from the database.
+    For usage your role should be "admin".
+    """
     await ServiceManager.delete_service(service_id)
 
 
@@ -54,7 +69,11 @@ async def delete_service(service_id: int):
     dependencies=[Depends(oauth2_scheme), Depends(is_admin_or_staff)],
     response_model=List[ServiceAndStateOut],
 )
-async def get_services_with_states(request: Request):
+async def get_services_with_states():
+    """
+    Outputs a list of services with actual states.
+    For usage your role should be "staff" or "admin".
+    """
     return await ServiceManager.get_services_with_states()
 
 
@@ -66,6 +85,13 @@ async def get_services_with_states(request: Request):
 async def get_service_states_history(
     service_name: str, limit: int = 15, offset: int = 0
 ):
+    """
+    Outputs the history of service states by the service name,
+    pagination is available by the query parameters
+    "limit" and "offset". Returns a message if service
+    does not exists or contains no states.
+    For usage your role should be "staff" or "admin".
+    """
     history = await ServiceManager.get_service_states_history(
         service_name, limit, offset
     )

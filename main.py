@@ -3,7 +3,11 @@ from fastapi import FastAPI
 from db import database
 from resources.routes import api_router
 
-app = FastAPI()
+app = FastAPI(
+    title="API documentation",
+    description="Реализация API из тестового задания",
+    version="0.1.0",
+)
 app.include_router(api_router)
 
 
