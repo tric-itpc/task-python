@@ -61,13 +61,44 @@ class ServiceManager:
 
     @staticmethod
     async def get_service_states_history(service_name, limit: int, offset: int):
-        # Query that finds service by its name
-        wanted_service = service.select().where(service.c.name == service_name)
+        # Subquery that finds service by its name
+        wanted_service_subq = service.select().where(
+            service.c.name == service_name
+        )
+
         query = (
             state.select()
-            .where(state.c.service_id == wanted_service.c.id)
+            .where(state.c.service_id == wanted_service_subq.c.id)
             .order_by(state.c.created_at.desc())
             .offset(offset)
             .limit(limit)
         )
         return await database.fetch_all(query)
+
+    @staticmethod
+    async def get_service_sla(service_name, start_date, end_date):
+        # Subquery that finds service by its name
+        wanted_service_subq = service.select().where(
+            service.c.name == service_name
+        )
+
+        # Query for the states between two dates
+        between_dates_q = (
+            state.select()
+            .where(state.c.service_id == wanted_service_subq.c.id)
+            .where(state.c.created_at >= start_date)
+            .where(state.c.created_at <= end_date)
+            .order_by(state.c.created_at.desc())
+        )
+
+        # Query for the state actual for the start date
+        before_start_date_q = (
+            state.select()
+            .where(state.c.service_id == wanted_service_subq.c.id)
+            .where(state.c.created_at < start_date)
+            .order_by(state.c.created_at.desc())
+            .limit(1)
+        )
+
+        union_query = between_dates_q.union(before_start_date_q)
+        return await database.fetch_all(union_query)
