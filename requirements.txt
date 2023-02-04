@@ -3,3 +3,4 @@ Django==3.2
 djangorestframework==3.12.4
 djangorestframework-simplejwt==4.7.2
 django-filter==22.1
+drf-yasg==1.21.4

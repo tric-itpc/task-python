@@ -30,9 +30,10 @@ class StatusSerializer(serializers.ModelSerializer):
                     f'Сервис {service.name} уже в состоянии {condition}')
         return data
 
+
 class LogSerializer(serializers.ModelSerializer):
     service = serializers.SlugRelatedField(slug_field='name',
-                                               queryset=Service.objects.all())
+                                           queryset=Service.objects.all())
 
     class Meta:
         fields = ('id', 'service', 'condition', 'timestamp')

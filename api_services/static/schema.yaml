@@ -1,0 +1,502 @@
+openapi: 3.0.2
+info:
+  title: 'Services API'
+  version: ''
+  description: |
+    запросы к API начинаются с `/api/v1/`
+    # Описание
+    Проект **Services API** помогает отслаживать и добавлять информацию о состоянии сервисов.
+    # Алгоритм регистрации пользователей
+    1. Админ добавляет нового пользователя через админ панель.
+    2. Пользователь оправляет POST-запрос с параметрами `username` и `password` на эндпоинт `/api/v1/jwt/create/`, в ответе ему приходит `access` и `refresh` токены
+    3. После окончания времени действия `access` токена пользователь может отправить POST-запрос на эндпоинт `api/v1/jwt/refresh/` с параметром `refresh` и обновить свой токен
+    # Пользовательские роли
+    - **Аноним** — имеет доступ только на чтение.
+    - **Аутентифицированный пользователь** (`user`) — может, как и **Аноним**, читать всё, дополнительно он может обновлять актуальное состояние сервиса.
+    - **Пенсонал** (`staff`) — полные права на управление всем контентом проекта. Может назначать роли пользователям. 
+    - **Суперюзер Django** — обладет правами персонала (`staff`)
+servers:
+  - url: /api/v1/
+tags:
+  - name: JWT
+    description: Выдача и обновление токенов
+  - name: SERVICES
+    description: Сервисы
+  - name: STATUSES
+    description: Актуальные статусы сервисов
+  - name: LOG
+    description: История изменения статусов сервисов.
+  - name: SLA
+    description: Сколько не работал сервис и его SLA
+paths:
+  /api/v1/statuses/:
+    get:
+      tags:
+        - STATUSES
+      operationId: Получение актуальных статусов
+      description: |
+        Получить список всех объектов.
+        Права доступа: **Доступно без токена**
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+          description: 'Удачное выполнение запроса'
+    post:
+      tags:
+        - STATUSES
+      operationId: Обновление статуса сервиса
+      description: |
+        Обновить статус сервиса.
+        Права доступа: **Пользователь**.
+        Нельзя добавлять уже установленный статус.
+        При добавлении статуса требуется указать уже существующий сервис и статус (`up`/`down`/`unstable`).
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Status'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Status'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Status'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+          description: ''
+        400:
+          description: 'Отсутствует обязательное поле или оно некорректно'
+        401:
+          description: Необходим JWT-токен
+  /api/v1/log/:
+    get:
+      tags:
+        - LOG
+      operationId: Получение истории изменения статусов
+      description: |
+        Получить историю изменения статусов.
+        Права доступа: **Доступно без токена**
+      parameters:
+      - name: search
+        required: false
+        in: query
+        description: Поиск истории изменения состояний конкретного сервиса
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Log'
+          description: 'Удачное выполнение запроса'
+  /api/v1/log/{id}/:
+    get:
+      tags:
+        - LOG
+      operationId: Получение конкретной записи в истории
+      description: |
+        Получить изменение статуса по id его записи в истории.
+        Права доступа: **Доступно без токена**
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this log.
+        schema:
+          type: string
+      - name: service
+        required: false
+        in: query
+        description: service
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Log'
+          description: ''
+  /api/v1/services/:
+    get:
+      tags:
+        - SERVICES
+      operationId: Список всех сервисов
+      description: |
+        Получить список всех сервисов.
+        Права доступа: **Доступно без токена**
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+          description: ''
+    post:
+      tags:
+        - SERVICES
+      operationId: Добавление сервиса
+      description: |
+        Добавить новый сервис
+        Права доступа: **Администратор**.
+        Нельзя добавлять уже существующие сервисы.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Service'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+          description: ''
+        400:
+          description: 'Отсутствует обязательное поле или оно некорректно'
+        401:
+          description: Необходим JWT-токен
+        403:
+          description: Нет прав доступа
+  /api/v1/services/{id}/:
+    get:
+      tags:
+        - SERVICES
+      operationId: Получение конкретного сервиса
+      description: |
+        Получить сервис по его id.
+        Права доступа: **Доступно без токена**
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID сервиса
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+          description: ''
+    put:
+      tags:
+        - SERVICES
+      operationId: Обновление информации о сервисе
+      description: |
+        Обновить информацию о сервисе.
+        Права доступа: **Администратор**
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID сервиса
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Service'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+          description: ''
+        401:
+          description: Необходим JWT-токен
+        403:
+          description: Нет прав доступа
+        404:
+          description: Объект не найден
+    patch:
+      tags:
+        - SERVICES
+      operationId: Обновление информации о сервисе
+      description: |
+        Обновить информацию о сервисе.
+        Права доступа: **Администратор**
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID сервиса
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Service'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+          description: ''
+        401:
+          description: Необходим JWT-токен
+        403:
+          description: Нет прав доступа
+        404:
+          description: Объект не найден
+    delete:
+      tags:
+        - SERVICES
+      operationId: Удаление сервиса
+      description: |
+        Удалить сервис
+        Права доступа: **Администратор**
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID сервиса
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'Удачное выполнение запроса'
+        401:
+          description: Необходим JWT-токен
+        403:
+          description: Нет прав доступа
+        404:
+          description: Произведение не найдено
+  /api/v1/sla/{service_name}/:
+    get:
+      tags:
+        - SLA
+      operationId: Вычисление SLA
+      description: |
+        Получить время, в течение которого не работал сервис, и его SLA. Можно задать промежуток времени. Если промежуток не передан, то начальная точка - первая запись в истории, последняя - текущий момент. Начальная точка не может быть раньше первой записи в истории.
+        Права доступа: **Доступно без токена**
+      parameters:
+      - name: service_name
+        in: path
+        required: true
+        description: 'Имя сервиса'
+        schema:
+          type: string
+      - name: start
+        in: query
+        description: Задает начальную точку. Формат `%Y-%m-%d %H:%M:%S`
+        schema:
+          type: string
+      - name: end
+        in: query
+        description: Задает конечную точку. Формат `%Y-%m-%d %H:%M:%S`
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+  /api/v1/jwt/create/:
+    post:
+      tags:
+        - JWT
+      operationId: Получение токена
+      description: |
+        Получить `access` и `refresh` токены, передав `username` и `password`.
+        Права доступа: **Доступно без токена.**
+        Пользователь должен быть создан администратором.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/v1/jwt/refresh/:
+    post:
+      tags:
+        - JWT
+      operationId: Обновление токена
+      description: 'Takes a refresh type JSON web token and returns an access type
+        JSON web
+
+        token if the refresh token is valid.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/v1/jwt/verify/:
+    post:
+      tags:
+        - JWT
+      operationId: Проверка валидности токена
+      description: 'Takes a token and indicates if it is valid.  This view provides
+        no
+
+        information about a token''s fitness for a particular use.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+components:
+  schemas:
+    Status:
+      type: object
+      properties:
+        service:
+          type: string
+        condition:
+          enum:
+          - up
+          - down
+          - unstable
+          type: string
+        description:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - service
+      - condition
+    Log:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        service:
+          type: string
+        condition:
+          enum:
+          - up
+          - down
+          - unstable
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+      required:
+      - service
+      - condition
+      - timestamp
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 256
+      required:
+      - name
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - username
+      - password
+    TokenRefresh:
+      type: object
+      properties:
+        refresh:
+          type: string
+        access:
+          type: string
+          readOnly: true
+      required:
+      - refresh
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+      - token

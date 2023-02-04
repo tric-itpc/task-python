@@ -1,7 +1,7 @@
 import datetime
 
 from django.utils.timezone import utc
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -12,7 +12,14 @@ from .permissions import IsAdminOrReadOnly
 from .filters import LogFilter
 
 
+class ListCreateViewSet(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        viewsets.GenericViewSet):
+    pass
+
+
 class LogViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet для обработки запросов к истории состояния сервисов."""
     queryset = Log.objects.all()
     serializer_class = LogSerializer
     filterset_class = LogFilter
@@ -20,18 +27,21 @@ class LogViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
+    """ViewSet для обработки запросов к сервисам."""
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
     permission_classes = (IsAdminOrReadOnly,)
 
 
-class StatusViewSet(viewsets.ModelViewSet):
+class StatusViewSet(ListCreateViewSet):
+    """ViewSet для обработки запросов к актуальным состояниям сервисов."""
     queryset = Status.objects.order_by('-timestamp')
     serializer_class = StatusSerializer
 
 
 @api_view(['GET'])
 def SLAView(request, service_name):
+    """Получение времени, в течение которого не работал сервис, и его SLA."""
     service = get_object_or_404(Service, name=service_name)
     service_logs = Log.objects.filter(service=service)
     if not service_logs:
@@ -66,9 +76,11 @@ def SLAView(request, service_name):
     for i in range(len(service_logs) - 1):
         log = service_logs[i]
         last_log = service_logs.last()
-        if log.is_down and service_logs[i+1].timestamp > start and log.timestamp < end:
+        if (log.is_down and service_logs[i+1].timestamp > start and
+                log.timestamp < end):
             down_time += service_logs[i+1].timestamp - log.timestamp
-        if last_log.is_down and last_log.timestamp < end and i != len(service_logs) - 1:
+        if (last_log.is_down and last_log.timestamp < end and
+                i != len(service_logs) - 1):
             down_time += end - last_log.timestamp
     if current_status.condition == 'down' and current_status.timestamp < end:
         if current_status.timestamp < start:
@@ -78,7 +90,8 @@ def SLAView(request, service_name):
     SLA = (end - start - down_time) / (end - start) * 100
     data = {
         'name': service_name,
-        'down_time': str(datetime.timedelta(seconds=down_time.total_seconds())),
+        'down_time': str(datetime.timedelta(
+            seconds=down_time.total_seconds())),
         'SLA': f'{SLA:.3f} %'
     }
     return Response(data=data, status=status.HTTP_200_OK)

@@ -29,7 +29,6 @@ class Status(models.Model):
                                      auto_now_add=True)
     description = models.TextField(verbose_name='Описание', blank=True)
 
-
     class Meta:
         verbose_name = 'Статус'
         verbose_name_plural = 'Статусы'
