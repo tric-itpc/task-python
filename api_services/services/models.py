@@ -27,6 +27,8 @@ class Status(models.Model):
                                  choices=CONDITION_CHOICES, max_length=8)
     timestamp = models.DateTimeField(verbose_name='Время обновления',
                                      auto_now_add=True)
+    description = models.TextField(verbose_name='Описание', blank=True)
+
 
     class Meta:
         verbose_name = 'Статус'
@@ -56,3 +58,8 @@ class Log(models.Model):
     condition = models.CharField(verbose_name='Состояние',
                                  choices=CONDITION_CHOICES, max_length=8)
     timestamp = models.DateTimeField(verbose_name='Время обновления')
+    description = models.TextField(verbose_name='Описание', blank=True)
+
+    @property
+    def is_down(self):
+        return self.condition == 'down'
