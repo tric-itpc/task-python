@@ -20,18 +20,3 @@ def admin_client() -> APIClient:
     return client
 
 
-@pytest.fixture
-def service_records():
-    Service.objects.bulk_create([
-        Service(name='Service 1', state='2', description='123'),
-        Service(name='', state='', description=''),
-        Service(name='', state='', description=''),
-        Service(name='', state='', description=''),
-        Service(name='', state='', description=''),
-        Service(name='', state='', description=''),
-        Service(name='', state='', description=''),
-        Service(name='', state='', description=''),
-        Service(name='', state='', description=''),
-        Service(name='', state='', description=''),
-        Service(name='', state='', description=''),
-    ])

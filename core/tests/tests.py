@@ -14,7 +14,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "local_settings.py")
 
 
 @pytest.mark.django_db
-def test_list_services(admin_client, service_records):
+def test_list_services(admin_client):
     url = reverse('service-list')
     response = admin_client.get(url)
 
