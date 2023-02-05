@@ -18,6 +18,9 @@
 
 ### Реализация
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/b0163fa1df13db99f77b/maintainability)](https://codeclimate.com/github/rezajkee/task-python/maintainability)
+[![Linters](https://github.com/rezajkee/task-python/actions/workflows/linters.yml/badge.svg?branch=solution)](https://github.com/rezajkee/task-python/actions/workflows/linters.yml)
+
 Под капотом у сервиса фреймворк FastAPI и ORM SQLAlchemy, в качестве базы данных по умолчанию – PostgreSQL.
 
 Реализована аутентификация через JSON Web Token, срок действия токена – 120 минут. Доступ к функциям сервиса предоставляется
