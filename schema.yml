@@ -1,0 +1,129 @@
+openapi: 3.0.3
+info:
+  title: Python Test Task API
+  version: 1.0.0
+  description: 'API for storing services with statuses: "Working", "Not Working" and
+    "Unstable". Also counts downtime and SLA %.'
+paths:
+  /api/:
+    get:
+      operationId: api_retrieve
+      description: List all Services.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+          description: ''
+    post:
+      operationId: api_create
+      description: Create Service with given data.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Service'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Service'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+          description: ''
+  /api/details/{slug_name}:
+    get:
+      operationId: api_details_retrieve
+      description: View Service's details.
+      parameters:
+      - in: path
+        name: slug_name
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+          description: ''
+components:
+  schemas:
+    Service:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug_name:
+          type: string
+          readOnly: true
+          title: Slugified name
+          pattern: ^[-a-zA-Z0-9_]+$
+        state:
+          allOf:
+          - $ref: '#/components/schemas/StateEnum'
+          minimum: -32768
+          maximum: 32767
+        description:
+          type: string
+          maxLength: 1000
+        created_at:
+          type: string
+          format: date-time
+        sla:
+          type: string
+          readOnly: true
+        downtime:
+          type: number
+          format: double
+          readOnly: true
+      required:
+      - description
+      - downtime
+      - name
+      - sla
+      - slug_name
+      - state
+      - url
+    StateEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      type: integer
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

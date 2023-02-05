@@ -1,0 +1,13 @@
+*.pyc
+*~
+__pycache__
+venv
+db.sqlite3
+/static
+.DS_Store
+Scripts
+Lib
+.idea
+task_python/.env
+pyvenv.cfg
+.pytest_cache
