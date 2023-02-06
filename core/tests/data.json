@@ -1,0 +1,58 @@
+[
+  {
+    "pk": 8,
+    "created_at": "2023-02-04T22:27:29.490Z",
+    "name": "Demo Service",
+    "slug_name": "demo-service",
+    "state": 1,
+    "description": "demo service"
+  },
+  {
+    "pk": 9,
+    "created_at": "2023-02-04T22:28:12.820Z",
+    "name": "Demo Service",
+    "slug_name": "demo-service",
+    "state": 2,
+    "description": "demo service"
+  },
+  {
+    "pk": 10,
+    "created_at": "2023-02-04T22:28:53.955Z",
+    "name": "Demo Service",
+    "slug_name": "demo-service",
+    "state": 1,
+    "description": "demo service"
+  },
+  {
+    "pk": 11,
+    "created_at": "2023-02-05T16:03:13.214Z",
+    "name": "Demo Service1",
+    "slug_name": "demo-service1",
+    "state": 2,
+    "description": "Description"
+  },
+  {
+    "pk": 12,
+    "created_at": "2023-02-05T17:00:34.602Z",
+    "name": "Demo Service1",
+    "slug_name": "demo-service1",
+    "state": 1,
+    "description": "Demo Service1 working"
+  },
+  {
+    "pk": 13,
+    "created_at": "2023-02-05T17:00:54.191Z",
+    "name": "Demo Service1",
+    "slug_name": "demo-service1",
+    "state": 2,
+    "description": "Demo Service1 not working"
+  },
+  {
+    "pk": 14,
+    "created_at": "2023-02-05T17:01:24.473Z",
+    "name": "Demo Service1",
+    "slug_name": "demo-service1",
+    "state": 1,
+    "description": "Demo Service1 working"
+  }
+]
