@@ -44,7 +44,6 @@ class Service(BaseModel):
         verbose_name = _('Service')
         verbose_name_plural = _('Services')
         indexes = [
-                   models.Index(fields=['slug_name', 'created_at']),
-                   models.Index(fields=['created_at']),
-                   ]
-
+            models.Index(fields=['slug_name']),
+            models.Index(fields=['-created_at']),
+        ]
