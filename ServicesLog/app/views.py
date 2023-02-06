@@ -91,12 +91,13 @@ class LastStatuses(web.View):
         full_res = {}
         for service in services_list:
             services_statuses_list = await self.request.app["db"].services_statuses_list.query.where(ServicesStatusesList.id == service.id).gino.all()
-            counter = 0
-            for i in services_statuses_list:
-                if 300 > i.status >= 200:
-                    counter += 1
-            sla = counter / len(services_statuses_list)
-            full_res.update({ service.name : { 'URL' : service.url ,'status' : services_statuses_list[-1].status, 'last_update' : str(services_statuses_list[-1].datetime), 'SLA' : str(round(sla*100,3))+"%", 'Description' : service.des }})
+            if len(services_statuses_list) > 0:
+                counter = 0
+                for i in services_statuses_list:
+                    if 300 > i.status >= 200:
+                        counter += 1
+                sla = counter / len(services_statuses_list)
+                full_res.update({ service.name : { 'URL' : service.url ,'status' : services_statuses_list[-1].status, 'last_update' : str(services_statuses_list[-1].datetime), 'SLA' : str(round(sla*100,3))+"%", 'Description' : service.des }})
         return web.json_response(full_res)
 class Interval(web.View):
     async def post(self):
