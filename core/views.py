@@ -9,13 +9,6 @@ from .serializers import ServiceSerializer
 
 
 class ServiceListApiView(GenericAPIView):
-    """
-    get:
-    Return a list of all existing Services.
-
-    post:
-    Create a new Service instance.
-    """
 
     # adding permissions to check if user is authenticated
     permission_classes = [permissions.IsAuthenticated]
@@ -23,11 +16,13 @@ class ServiceListApiView(GenericAPIView):
     queryset = Service.objects.all()
 
     def get(self, request, *args, **kwargs):
+        """ Return a list of all existing Services. """
         services = Service.objects.order_by('slug_name', '-created_at').distinct('slug_name')
         serializer = ServiceSerializer(services, context={'request': request}, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        """ Create a new Service instance. """
         data = {
             'name': request.data.get('name'),
             'state': request.data.get('state'),
@@ -42,17 +37,13 @@ class ServiceListApiView(GenericAPIView):
 
 
 class ServiceDetailsApiView(GenericAPIView):
-    """
-    get:
-    Return specific Service details with history of states, current SLA and total downtime.
-    """
-
     # adding permissions to check if user is authenticated
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ServiceSerializer
     queryset = Service.objects.all()
 
     def get(self, request, *, slug_name):
+        """ Return specific Service details with history of states, current SLA and total downtime. """
         services = Service.objects.filter(slug_name=slug_name).order_by('-created_at')
         if len(services) == 0:
             raise Http404()
