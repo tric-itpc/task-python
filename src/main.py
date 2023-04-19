@@ -31,7 +31,9 @@ def post_service():
         state = service['state']
 
         if name not in services:
-            services[name] = {'description': description, 'state': state, 'history': []}
+            services[name] = {'description': description,
+                              'state': state,
+                              'history': []}
         else:
             services[name]['description'] = description
             services[name]['state'] = state
