@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  api:
+    container_name: test_api
+    environment:
+      - HOST_NAME=localhost
+    env_file:
+      - .env
+    build: ./app/
+    restart: always
+    ports:
+      - '8099:8099'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - proxynet
+
+  postgres:
+    image: postgres:15.3-bullseye
+    container_name: test_postgres
+    restart: always
+    ports:
+      - '5439:5432'
+    environment:
+      - POSTGRES_DB=test_db
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_pass
+      - POSTGRES_INITDB_ARGS='--encoding=UTF-8'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: 'pg_isready -d api_db -U test_user'
+      interval: 3s
+      timeout: 30s
+      retries: 5
+    networks:
+      - proxynet
+
+volumes:
+  postgres_data:
+    driver: local
+
+
+networks:
+  proxynet:
+    name: proxy
+    driver: bridge
