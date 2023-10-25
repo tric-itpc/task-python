@@ -1,8 +1,7 @@
 import uuid
 
-from sqlalchemy import Column, String, Integer, DateTime
+from sqlalchemy import Column, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
-
 
 from src.database import Base
 
@@ -19,4 +18,4 @@ class ServiceStatus(Base):
     name = Column(String, nullable=False)
     service_status = Column(String, nullable=False)
     description = Column(String)
-    
+    created_at = Column(DateTime, nullable=False)
