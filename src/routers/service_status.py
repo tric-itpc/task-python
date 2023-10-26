@@ -1,26 +1,43 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from typing import List
+
 from src.database import get_session
 from src.schemas.service_status import ServiceStatusInSchema, ServiceStatusOutSchema
-from src.services.service_status import post
+from src.services.service_status import post, get_list
 
 router = APIRouter(
     prefix='/services_statuses'
 )
 
 @router.post('/add/', summary='Добавить новый сервис и статус для него, либо обновить статус существующего сервиса', response_model=ServiceStatusOutSchema)
-async def service_status_add(payload: ServiceStatusInSchema, session: AsyncSession = Depends(get_session)):
+async def add(payload: ServiceStatusInSchema, session: AsyncSession = Depends(get_session)):
     try:
-        status = await post(payload, session)
-        session.add(status)
+        result = await post(payload, session)
+        session.add(result)
         await session.commit()  
         return {
-            "id": status.id,
-            "name": status.name,
-            "service_status": status.service_status,
-            "description": status.description,
-            "created_at": status.created_at
+            "id": result.id,
+            "name": result.name,
+            "service_status": result.service_status,
+            "description": result.description,
+            "created_at": result.created_at
         }
     except ValueError:
         raise HTTPException(status_code=400, detail='Данный статус для указанного сервиса уже является актуальным')
+    
+@router.get('/list/', summary='Получить список актуальных состояний для каждого сервиса', response_model=List[ServiceStatusOutSchema])
+async def list(session: AsyncSession = Depends(get_session)):
+    statuses_list = await get_list(session)
+    return [
+        {
+            'name': st.name,
+            'service_status': st.service_status,
+            'description': st.description,
+            'id': st.id,
+            'created_at': st.created_at
+        }
+    for st in statuses_list]
+    
+    

@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func, text
 
 import datetime as dt
 
@@ -22,3 +22,16 @@ async def latest_status_simmilar(name: str, service_status: str, session: AsyncS
     except AttributeError:
         return False
                                 
+async def get_list(session: AsyncSession):
+    stmt = text(
+        '''SELECT st1.*
+FROM statuses as st1
+JOIN (SELECT st2.name, MAX(st2.created_at) AS latest_time
+	 FROM statuses AS st2
+	 GROUP BY st2.name) as st2
+ON st1.name = st2.name
+WHERE st1.created_at = st2.latest_time'''
+    )
+    # stmt = select(ServiceStatus).group_by(ServiceStatus.name)  
+    result = await session.execute(stmt)
+    return result
