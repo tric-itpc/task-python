@@ -32,6 +32,10 @@ JOIN (SELECT st2.name, MAX(st2.created_at) AS latest_time
 ON st1.name = st2.name
 WHERE st1.created_at = st2.latest_time'''
     )
-    # stmt = select(ServiceStatus).group_by(ServiceStatus.name)  
     result = await session.execute(stmt)
     return result
+
+async def retrieve(name: str, session: AsyncSession):
+    stmt = select(ServiceStatus).filter_by(name=name).order_by(ServiceStatus.created_at.desc())
+    result = await session.execute(stmt)
+    return result.scalars().all()

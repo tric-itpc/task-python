@@ -5,7 +5,7 @@ from typing import List
 
 from src.database import get_session
 from src.schemas.service_status import ServiceStatusInSchema, ServiceStatusOutSchema
-from src.services.service_status import post, get_list
+from src.services.service_status import post, get_list, retrieve
 
 router = APIRouter(
     prefix='/services_statuses'
@@ -39,5 +39,10 @@ async def list(session: AsyncSession = Depends(get_session)):
             'created_at': st.created_at
         }
     for st in statuses_list]
+
+@router.get('/retrieve/', summary='История всех состояний для интересующего сервиса', response_model=List[ServiceStatusOutSchema])
+async def get(name: str, session: AsyncSession = Depends(get_session)):
+    service_history = await retrieve(name, session)
+    return service_history
     
     
