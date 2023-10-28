@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, text
+from sqlalchemy import select, text
 
 import datetime as dt
 
@@ -39,3 +39,10 @@ async def retrieve(name: str, session: AsyncSession):
     stmt = select(ServiceStatus).filter_by(name=name).order_by(ServiceStatus.created_at.desc())
     result = await session.execute(stmt)
     return result.scalars().all()
+
+def sla(name: str,start_time: dt.datetime, end_time: dt.datetime, session: AsyncSession = AsyncSession):
+
+    return {
+        'start_time': start_time,
+        'end_time': end_time
+    }

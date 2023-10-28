@@ -3,9 +3,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from typing import List
 
+import datetime as dt
+
 from src.database import get_session
 from src.schemas.service_status import ServiceStatusInSchema, ServiceStatusOutSchema
 from src.services.service_status import post, get_list, retrieve
+from src.utils.sla import ServiceStats
 
 router = APIRouter(
     prefix='/services_statuses'
@@ -44,5 +47,27 @@ async def list(session: AsyncSession = Depends(get_session)):
 async def get(name: str, session: AsyncSession = Depends(get_session)):
     service_history = await retrieve(name, session)
     return service_history
+
+@router.get('/sla_info/')
+async def sla_info(name: str, start_time: dt.datetime = dt.datetime.now() - dt.timedelta(days=1), end_time: dt.datetime = dt.datetime.now(), session: AsyncSession = Depends(get_session)):
+    service_history = await retrieve(name, session)
+    statistics = ServiceStats(start_time=str(start_time), end_time=str(end_time), data=service_history)
+    if start_time > end_time:
+        raise HTTPException(status_code=400, detail='start_time должно быть меньше end_time')
+    try:
+        not_working = statistics.not_online_time_total()
+        not_working = str(dt.timedelta(seconds=not_working[2]))
+        sla = statistics.count_sla()
+        return {
+            "not_working": not_working,
+            "sla": f'{round(sla*100, 3)} %'
+        }
+    except ValueError:
+        raise HTTPException(status_code=400, detail='start_time должно быть меньше end_time')
+    except ZeroDivisionError:
+        return "Сервис работал без перебоев"
+                
+           
+    
     
     
