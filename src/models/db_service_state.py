@@ -1,17 +1,27 @@
 import uuid
+from datetime import datetime
+from typing import Literal, TYPE_CHECKING
 
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import UUID as UUID_SQL, text
+from sqlalchemy import ForeignKey, text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.models import Base
+
+if TYPE_CHECKING:
+    from .db_services import Service
 
 
-class Base(DeclarativeBase):
-    id: Mapped[str] = mapped_column(
-        UUID_SQL,
-        nullable=False,
-        default=uuid.uuid4,
-        server_default=text("uuid_generate_v4()"),
-        unique=True,
-        primary_key=True
+class ServiceState(Base):
+    service_state: Mapped[Literal["stable", "unstable", "disable"]]
+    created_at: Mapped[datetime] = mapped_column(
+        default=datetime.now,
+        server_default=text("now()")
     )
-    service_name: Mapped[str]
-    
+    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("services.id"))
+    service: Mapped["Service"] = relationship(back_populates="state")
+
+    def __str__(self):
+        return f"{self.__class__.__name__}: current_state - {self.service_state}, {self.created_at}"
+
+    def __repr__(self):
+        return str(self)

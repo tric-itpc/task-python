@@ -2,7 +2,9 @@ import asyncio
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, async_scoped_session
 
-database_connect_url = ""
+from src.config import DB_USER, DB_PASS, DB_HOST, DB_NAME, DB_PORT
+
+DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 current_task = asyncio.current_task
 
@@ -36,5 +38,5 @@ class DatabaseHelper:
         print("session closed")
 
 
-db_helper = DatabaseHelper(url=database_connect_url)
+db_helper = DatabaseHelper(url=DATABASE_URL)
 
