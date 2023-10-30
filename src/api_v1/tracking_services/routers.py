@@ -18,7 +18,9 @@ from src.api_v1.tracking_services.service import states_manager
 router = APIRouter(tags=["State manager API"])
 
 
-@router.post(path="/create_service")
+@router.post(
+    path="/create_service"
+)
 async def create_service(
         service_schema: CreateServiceSchema,
         session: AsyncSession = Depends(db_helper.get_scoped_session)
@@ -38,11 +40,24 @@ async def create_service(
     return service_model
 
 
-@router.get(path="/all_services_state")
+@router.get(
+    path="/all_services_state",
+    response_model=AllServiceStates,
+    description="""
+    Get the current state of services 
+    (assume that the last record is the current state)
+    """
+)
 async def get_all_services_state(
         session: AsyncSession = Depends(db_helper.get_scoped_session)
 ):
     services_states = await get_last_service_state(session=session)
+
+    if not services_states:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="There is no server with that name"
+        )
 
     return services_states
 

@@ -4,7 +4,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from src.models import Service, ServiceState
-from .schemas import CreateServiceSchema, ResponseHistory, ServiceData, ServiceStateHistory
+from .schemas import (
+    CreateServiceSchema,
+    ResponseHistory,
+    ServiceFullInformation,
+    ServiceStateHistory,
+    AllServiceStates,
+    CurrentServiceState
+)
 
 
 async def get_state_history_from_db(
@@ -13,7 +20,7 @@ async def get_state_history_from_db(
         limit: int = 999
 ):
     stmt = select(Service).options(
-           selectinload(Service.all_states)
+        selectinload(Service.all_states)
     ).where(Service.service_name == service_name)
 
     service_history = await session.scalar(stmt)
@@ -23,7 +30,7 @@ async def get_state_history_from_db(
     if not service_history:
         return None
 
-    service_data = ServiceData.model_validate(
+    service_data = ServiceFullInformation.model_validate(
         service_history, from_attributes=True
     )
 
@@ -66,8 +73,7 @@ async def add_service_state_in_db(
 ):
     service_state_model = ServiceState(
         service_id=service_id,
-        service_state=service_state
-    )
+        service_state=service_state)
 
     session.add(service_state_model)
     await session.commit()
@@ -90,7 +96,6 @@ async def get_last_service_state(
         session: AsyncSession,
         service_model: Service | None = None
 ):
-
     stmt = select(Service).options(
         selectinload(Service.state)
     ).order_by()
@@ -102,17 +107,18 @@ async def get_last_service_state(
 
     await session.close()
 
-    result = dict()
+    result = AllServiceStates()
     for service in services:
-        result[service.service_name] = service.state.service_state
+        state = service.state
+        if not state:
+            state = "disable"
+        else:
+            state = service.state.service_state
+        result.current_state.append(
+            CurrentServiceState(
+                service_name=service.service_name,
+                service_state=state
+            )
+        )
 
     return result
-
-
-
-
-
-
-
-
-

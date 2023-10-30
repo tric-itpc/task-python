@@ -20,6 +20,9 @@ class ServiceStateSchema(ServiceState):
     service_id: uuid.UUID
 
 
+class CurrentServiceState(ServiceState):
+    service_name: str
+
 class SuccessStartUpdateSchema(BaseModel):
     status: str = "service_update_started_success"
 
@@ -28,7 +31,7 @@ class SuccessAddServiceToTrack(BaseModel):
     status: str = "Service add to tracking!"
 
 
-class ServiceData(BaseModel):
+class ServiceFullInformation(BaseModel):
     service_name: str
     service_description: str
 
@@ -38,5 +41,10 @@ class ServiceStateHistory(ServiceState):
 
 
 class ResponseHistory(BaseModel):
-    service_info: ServiceData
+    service_info: ServiceFullInformation
     service_state_history: list[ServiceStateHistory] = []
+
+
+class AllServiceStates(BaseModel):
+    current_state: list[CurrentServiceState] = []
+
