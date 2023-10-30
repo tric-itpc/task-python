@@ -1,5 +1,6 @@
+from fastapi import HTTPException, status
+
 import asyncio
-from datetime import datetime
 from random import randint, choice
 from typing import Literal
 
@@ -8,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api_v1.tracking_services.schemas import ServiceStateSchema
 from src.models import Service
 from src.api_v1.tracking_services.crud import add_service_state_in_db, get_service_by_name
-
 
 class ServicesInWork:
     def __init__(self):
@@ -20,15 +20,15 @@ class ServicesInWork:
     async def start_tracking_services_states(self, session: AsyncSession):
         while True:
             interval = randint(1, 2)
-            status = counting_probability_of_status_change()
+            current_state = counting_probability_of_status_change()
             service_name = choice(list(self.services_states.keys()))
 
-            if self.services_states[service_name] != status:
-                self.services_states[service_name] = status
+            if self.services_states[service_name] != current_state:
+                self.services_states[service_name] = current_state
                 service = await get_service_by_name(session=session, service_name=service_name)
                 await add_service_state_in_db(
                     session=session,
-                    service_state=status,
+                    service_state=current_state,
                     service_id=service.id
                     )
 

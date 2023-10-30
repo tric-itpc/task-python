@@ -2,10 +2,10 @@ import asyncio
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status, HTTPException
 
 from src.models import db_helper
-from src.api_v1.tracking_services.schemas import CreateServiceSchema, ServiceStateSchema
+from src.api_v1.tracking_services.schemas import *
 from src.api_v1.tracking_services.crud import (
     add_service_in_db,
     add_service_state_in_db,
@@ -15,8 +15,7 @@ from src.api_v1.tracking_services.crud import (
 )
 from src.api_v1.tracking_services.service import states_manager
 
-
-router = APIRouter(tags=["state_manager"])
+router = APIRouter(tags=["State manager API"])
 
 
 @router.post(path="/create_service")
@@ -32,7 +31,7 @@ async def create_service(
     await add_service_state_in_db(
         session=session,
         service_id=service_model.id,
-        service_state=service_schema.state
+        service_state=service_schema.states
     )
     await session.close()
 
@@ -48,35 +47,71 @@ async def get_all_services_state(
     return services_states
 
 
-@router.get(path="/state_history/{service_name}")
+@router.get(
+    path="/state_history/{service_name}",
+    status_code=status.HTTP_200_OK,
+    description="To get states history service",
+    response_model=ResponseHistory
+)
 async def get_state_history(
         service_name: str,
         limit: int = 10,
         session: AsyncSession = Depends(db_helper.get_scoped_session)
 ):
-    return await get_state_history_from_db(
+    state_history = await get_state_history_from_db(
         session=session,
         service_name=service_name,
         limit=limit
     )
 
+    if not state_history:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="There is no server with that name"
+        )
 
-@router.post(path="/add_service_to_track")
+    return state_history
+
+
+@router.post(
+    path="/add_service_to_track",
+    status_code=status.HTTP_201_CREATED,
+    response_model=SuccessAddServiceToTrack,
+    description="Adds a service to the state update buffer"
+)
 async def add_service_to_track(
         service_name: str,
         session: AsyncSession = Depends(db_helper.get_scoped_session)
 ):
     service_model = await get_service_by_name(session=session, service_name=service_name)
+    if not service_model:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Service not found, try again!"
+        )
     current_state = await get_last_service_state(session=session, service_model=service_model)
 
     states_manager.add_service(service=service_model, state=current_state[service_name])
 
-    print(states_manager.services_states)
+    return SuccessAddServiceToTrack()
 
 
-@router.post(path="/start_tracking")
+@router.post(
+    path="/start_tracking",
+    response_model=SuccessStartUpdateSchema,
+    status_code=status.HTTP_202_ACCEPTED,
+    description="Endpoint for starting update services conditions"
+)
 async def start_tracking_services(
         session: AsyncSession = Depends(db_helper.get_scoped_session)
-):
-    asyncio.create_task(states_manager.start_tracking_services_states(session=session))
-    return "ok"
+) -> SuccessStartUpdateSchema:
+    if not states_manager.services_states:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Tracking list is empty"
+        )
+    asyncio.create_task(
+        states_manager.start_tracking_services_states(session=session)
+    )
+
+    return SuccessStartUpdateSchema()

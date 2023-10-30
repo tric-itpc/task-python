@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from src.models import Service, ServiceState
-from .schemas import CreateServiceSchema
+from .schemas import CreateServiceSchema, ResponseHistory, ServiceData, ServiceStateHistory
 
 
 async def get_state_history_from_db(
@@ -20,12 +20,16 @@ async def get_state_history_from_db(
 
     await session.close()
 
-    result = {
-        "service_info": {
-            "service_name": service_history.service_name,
-            "service_description": service_history.service_description
-        }
-    }
+    if not service_history:
+        return None
+
+    service_data = ServiceData.model_validate(
+        service_history, from_attributes=True
+    )
+
+    result = ResponseHistory(
+        service_info=service_data
+    )
 
     counter = 0
 
@@ -34,7 +38,9 @@ async def get_state_history_from_db(
             break
         counter += 1
         print(state)
-        result[state.created_at] = state.service_state
+        result.service_state_history.append(
+            ServiceStateHistory.model_validate(state, from_attributes=True)
+        )
 
     return result
 
@@ -75,7 +81,7 @@ async def get_service_by_name(
 ) -> Service:
     stmt = select(Service).where(Service.service_name == service_name)
     result = await session.execute(stmt)
-    service = result.scalar()
+    service: Service | None = result.one_or_none()
 
     return service
 
