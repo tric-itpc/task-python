@@ -51,4 +51,4 @@ $ sudo docker compose up
 
 
 ## Команда проекта
-- [Advatrnoiks](t.me/advatroniks) — Back-End Engineer
+- [Advatrnoiks](t.me/advatroniks) tixxx333@yandex.ru — Back-End Engineer
