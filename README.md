@@ -46,4 +46,4 @@ $ sudo docker compose up
 
 
 ## Команда проекта
-- [Advatrnoiks](tg://resolve?domain=advatrnoiks) — Back-End Engineer
+- [Advatrnoiks](t.me/advatroniks) — Back-End Engineer
