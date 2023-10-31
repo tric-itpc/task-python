@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  api_application:
+    build:
+      context: .
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_PASS=postgres
+      - DB_NAME=postgres
+      - DB_USER=postgres
+    container_name: api_application
+    restart: unless-stopped
+    hostname: api_application
+#    env_file:
+#      - env.txt
+    ports:
+      - "8080:80"
+#    command: "sh -c 'alembic upgrade head'"
+    depends_on:
+      - db
+      - migrations
+    volumes:
+      - fastapi-data-alembic:/home/app/score_spin/alembic
+    networks:
+      - test_task_network
+
+  db:
+    image: postgres:alpine3.18
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+    hostname: db
+    ports:
+      - "9090:5432"
+#    env_file:
+#      - env.txt
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./sql/extension.sql:/docker-entrypoint-initdb.d/extension.sql
+    networks:
+      - test_task_network
+
+  migrations:
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_PASS=postgres
+      - DB_NAME=postgres
+      - DB_USER=postgres
+    command: "sh -c 'alembic upgrade head'"
+    depends_on:
+      - db
+    networks:
+      - test_task_network
+
+networks:
+  test_task_network:
+    driver: bridge
+    name: test_task_network
+
+volumes:
+  postgres-data:
+  fastapi-data-alembic:

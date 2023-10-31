@@ -7,7 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import Service
 from src.api_v1.tracking_services.crud import add_service_state_in_db, get_service_by_name
 
-class ServicesInWork:
+
+class ServiceStateUpdater:
+    """
+    Класс, который обновляет состояние сервисов(имитирую их реальную работу)
+    и при каждом обновлении сотояния записывает в БД.
+    """
     def __init__(self):
         self.services_states: dict[str:Literal["stable", "unstable", "disable"]] = dict()
 
@@ -43,5 +48,5 @@ def counting_probability_of_status_change() -> str:
     return "stable"
 
 
-states_manager = ServicesInWork()
+states_manager = ServiceStateUpdater()
 
