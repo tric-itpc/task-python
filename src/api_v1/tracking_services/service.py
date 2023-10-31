@@ -1,12 +1,9 @@
-from fastapi import HTTPException, status
-
 import asyncio
 from random import randint, choice
 from typing import Literal
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api_v1.tracking_services.schemas import ServiceStateSchema
 from src.models import Service
 from src.api_v1.tracking_services.crud import add_service_state_in_db, get_service_by_name
 
