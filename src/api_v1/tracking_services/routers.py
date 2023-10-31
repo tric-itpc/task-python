@@ -120,12 +120,12 @@ async def add_service_to_track(
 
 
 @router.post(
-    path="/start_tracking",
+    path="/start_update_service_state",
     response_model=SuccessStartUpdateSchema,
     status_code=status.HTTP_202_ACCEPTED,
     description="Endpoint for starting update services conditions"
 )
-async def start_tracking_services(
+async def start_update_service_state(
         session: AsyncSession = Depends(db_helper.get_scoped_session)
 ) -> SuccessStartUpdateSchema:
     """
