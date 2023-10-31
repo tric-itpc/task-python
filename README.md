@@ -10,6 +10,7 @@
 ## Содержание
 - [Технологии](#технологии)
 - [Использование](#использование)
+- [Документация](#документация)
 - [To do](#to-do)
 - [Команда проекта](#команда-проекта)
 
@@ -20,6 +21,7 @@
 - [Pydantic](https://docs.pydantic.dev/latest/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [Docker](https://www.docker.com/)
+- [OpenAPI](https://www.openapis.org/)
 
 
 ## Использование
@@ -39,6 +41,9 @@ $ cd /task-python
 ```docker
 $ sudo docker compose up
 ```
+## Документация
+После запуска документация доступна по адресу http://127.0.0.1:8080/docs#/
+Реализовано через OpenAPI(Swagger)
 
 ## To do
 - [x] Основной функционал
