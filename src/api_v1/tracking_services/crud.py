@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import select
 
 from src.models import Service, ServiceState
-from .schemas import (
+from src.api_v1.tracking_services.schemas import (
     CreateServiceSchema,
     ResponseHistory,
     ServiceFullInformation,

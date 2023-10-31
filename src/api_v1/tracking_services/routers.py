@@ -4,8 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from src.models import db_helper
+
+from src.api_v1.tracking_services.service import states_manager
 from src.api_v1.tracking_services.schemas import *
+from src.models import db_helper
 from src.api_v1.tracking_services.crud import (
     add_service_in_db,
     add_service_state_in_db,
@@ -13,7 +15,7 @@ from src.api_v1.tracking_services.crud import (
     get_last_service_state,
     get_state_history_from_db
 )
-from src.api_v1.tracking_services.service import states_manager
+
 
 router = APIRouter(tags=["State manager API"])
 
@@ -101,6 +103,9 @@ async def add_service_to_track(
         service_name: str,
         session: AsyncSession = Depends(db_helper.get_scoped_session)
 ):
+    """
+    Добавление сервиса (СУЩЕСТВУЮЩЕГО!) в буфер сервиса для обновления состояний.
+    """
     service_model = await get_service_by_name(session=session, service_name=service_name)
     if not service_model:
         raise HTTPException(
@@ -123,6 +128,10 @@ async def add_service_to_track(
 async def start_tracking_services(
         session: AsyncSession = Depends(db_helper.get_scoped_session)
 ) -> SuccessStartUpdateSchema:
+    """
+    Энвпоинт для запуска обновлений состояний сервисов(которые добавлены для
+    отслеживания)
+    """
     if not states_manager.services_states:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
