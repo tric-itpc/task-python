@@ -19,7 +19,10 @@ router = APIRouter(tags=["State manager API"])
 
 
 @router.post(
-    path="/create_service"
+    path="/create_service",
+    response_model=ResponseService,
+    description="If creation is successful, the service ID is returned",
+    status_code=status.HTTP_201_CREATED
 )
 async def create_service(
         service_schema: CreateServiceSchema,
@@ -33,7 +36,7 @@ async def create_service(
     await add_service_state_in_db(
         session=session,
         service_id=service_model.id,
-        service_state=service_schema.states
+        service_state=service_schema.service_state
     )
     await session.close()
 

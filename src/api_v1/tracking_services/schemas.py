@@ -23,6 +23,11 @@ class ServiceStateSchema(ServiceState):
 class CurrentServiceState(ServiceState):
     service_name: str
 
+
+class ResponseService(BaseModel):
+    id: uuid.UUID
+
+
 class SuccessStartUpdateSchema(BaseModel):
     status: str = "service_update_started_success"
 
