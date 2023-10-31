@@ -112,9 +112,9 @@ async def add_service_to_track(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Service not found, try again!"
         )
-    current_state = await get_last_service_state(session=session, service_model=service_model)
 
-    states_manager.add_service(service=service_model, state=current_state[service_name])
+    current_state = await get_last_service_state(session=session, service_model=service_model)
+    states_manager.add_service(service=service_model, state=current_state.current_state)
 
     return SuccessAddServiceToTrack()
 

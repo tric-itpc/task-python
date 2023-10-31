@@ -119,9 +119,9 @@ async def get_service_by_name(
     """
     stmt = select(Service).where(Service.service_name == service_name)
     result = await session.execute(stmt)
-    service: Service | None = result.one_or_none()
+    service = result.one_or_none()
 
-    return service
+    return service[0]
 
 
 async def get_last_service_state(
@@ -136,9 +136,10 @@ async def get_last_service_state(
     :param service_model: Service sqlalchemy model OR None obj.
     :return: AllServiceStates pydantic obj.
     """
+
     stmt = select(Service).options(
         selectinload(Service.state)
-    ).order_by()
+    )
 
     if service_model:
         stmt = stmt.where(Service.service_name == service_model.service_name)
