@@ -52,7 +52,7 @@ async def get_state_history_from_db(
 
     counter = 0
     for state in service_history.all_states:
-        if counter > limit:
+        if counter >= limit:
             break
         counter += 1
         print(state)

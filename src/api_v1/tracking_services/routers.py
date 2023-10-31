@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, status, HTTPException
 
 
-from src.api_v1.tracking_services.service import states_manager
+from src.api_v1.tracking_services.update_service_module import states_manager
 from src.api_v1.tracking_services.schemas import *
 from src.models import db_helper
 from src.api_v1.tracking_services.crud import (
