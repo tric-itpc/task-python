@@ -13,15 +13,10 @@ services:
     container_name: api_application
     restart: unless-stopped
     hostname: api_application
-#    env_file:
-#      - env.txt
     ports:
       - "8080:80"
-#    command: "sh -c 'alembic upgrade head'"
     depends_on:
       - migrations
-#    volumes:
-#      - fastapi-data-alembic:/home/app/score_spin/alembic
     networks:
       - test_task_network
 
@@ -33,7 +28,6 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-    hostname: db
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
       interval: 10s
@@ -42,8 +36,6 @@ services:
       start_period: 10s
     ports:
       - "9090:5432"
-#    env_file:
-#      - env.txt
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./sql/extension.sql:/docker-entrypoint-initdb.d/extension.sql
@@ -74,4 +66,3 @@ networks:
 
 volumes:
   postgres-data:
-#  fastapi-data-alembic:
