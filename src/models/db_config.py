@@ -1,6 +1,6 @@
 import asyncio
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, async_scoped_session
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, async_scoped_session
 
 from src.config import DB_USER, DB_PASS, DB_HOST, DB_NAME, DB_PORT
 
