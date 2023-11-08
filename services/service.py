@@ -74,19 +74,39 @@ def get_service_history(name: str, db: Session): # все изменения с�
     return db.query(ServiceHistory).filter(ServiceHistory.service_name == name).all()
 
 def calculate_sla(name: str, db: Session, start:str, end:str): #рассчет sla(костыльно - переписать)
-    histories = db.query(ServiceHistory).filter(ServiceHistory.service_name == name).filter(ServiceHistory.change_time>parser.parse(start))\
-        .filter(ServiceHistory.change_time < parser.parse(end)).all()
-    all_time = db.query(ServiceHistory).filter(ServiceHistory.service_name == name).all()
-    sum_not_stable = calc_sum_downtime(histories)
-    sum_not_stable2 = calc_sum_downtime(all_time)
 
-    s = (sum_not_stable2.total_seconds()-sum_not_stable.total_seconds())/sum_not_stable2.total_seconds()*100
+    service_object = db.query(Service).filter(Service.name == name.capitalize()).first()
+    if service_object is None:
+        raise HTTPException(status_code=400,
+                            detail='Такого сервиса нет в базе')
+
+
+    service_object = db.query(Service).filter(Service.name == name.capitalize()).first()
+    if service_object is None:
+        raise HTTPException(status_code=400,
+                            detail='Такого сервиса нет в базе')
+
+    if end<start:
+        raise HTTPException(status_code=400,
+                            detail='Неверный временной отрезок')
+
+    histories = db.query(ServiceHistory).filter(ServiceHistory.service_name == name)\
+        .filter(ServiceHistory.change_time>parser.parse(start)).filter(ServiceHistory.change_time < parser.parse(end)).all()
+    all_time = db.query(ServiceHistory).filter(ServiceHistory.service_name == name).all()
+    sum_not_stable, downtimes_by_period = calc_sum_downtime(histories)
+    sum_not_stable2, all_downtimes = calc_sum_downtime(all_time)
+    if all_downtimes != 0:
+        s = (sum_not_stable2.total_seconds() - sum_not_stable.total_seconds()) / sum_not_stable2.total_seconds() * 100
+    else:
+        s = 100
+
+
 
     return {'service_name': name,
             'from_date': parser.parse(start),
             'to_date': parser.parse(end),
             "SLA": round(s, 3),
-            "all_downtimes": len(all_time),
-            "downtimes_by_period" :len(histories)
+            "all_downtimes": all_downtimes,
+            "downtimes_by_period": downtimes_by_period,
             }
 

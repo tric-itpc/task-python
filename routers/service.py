@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database import get_db
 from schemas.service import SLA_output
-from func import service as ServiceCrud
+from services import service as ServiceCrud
 
 from schemas import service as ServiceSchema
 
