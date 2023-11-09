@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from schemas import service
 import dateutil.parser as parser
-from utils import calc_sum_downtime, calc_downtime
+from utils import calc_sum_downtime, calc_downtime, add_objects
 def create_service(data: service.Service, db): # создание сервиса
     service = Service(name=data.name, state=data.state, description=data.description)
 
@@ -12,23 +12,11 @@ def create_service(data: service.Service, db): # создание сервиса
     if service_object:
         raise HTTPException(status_code=400,
                             detail='Такой сервис уже в базе')
-    try:
-        db.add(service)
-        db.commit()
-        db.refresh(service)
-
-    except Exception as e:
-        print(e)
+    add_objects(service, db)
 
     serviceHistory = ServiceHistory(service_name=service.name, from_state=None, to_state=data.state,
                                      change_time=datetime.now()) # добавление изменения состояния
-    try:
-        db.add(serviceHistory)
-        db.commit()
-        db.refresh(serviceHistory)
-
-    except Exception as e:
-        print(e)
+    add_objects(serviceHistory, db)
 
     return service
 
@@ -50,13 +38,9 @@ def update_service(data: service.Service, db: Session, name: str): #обновл
     if service.state != data.state:
         serviceHistory = ServiceHistory(service_name=service.name, from_state=service.state, to_state=data.state, change_time=datetime.now(),
                                          time_not_working = calc_downtime(service.state, data.state, serviceHist.change_time))
-        try:
-            db.add(serviceHistory)
-            db.commit()
-            db.refresh(serviceHistory)
+        add_objects(serviceHistory, db)
 
-        except Exception as e:
-            print(e)
+
     service.name = data.name
     service.state = data.state
     service.description = data.description
@@ -71,15 +55,13 @@ def get_services_by_state(state: str, db: Session):
 
 
 def get_service_history(name: str, db: Session): # все изменения состояния сервиса
-    return db.query(ServiceHistory).filter(ServiceHistory.service_name == name).all()
-
-def calculate_sla(name: str, db: Session, start:str, end:str): #рассчет sla(костыльно - переписать)
-
     service_object = db.query(Service).filter(Service.name == name.capitalize()).first()
     if service_object is None:
         raise HTTPException(status_code=400,
                             detail='Такого сервиса нет в базе')
+    return db.query(ServiceHistory).filter(ServiceHistory.service_name == name).all()
 
+def calculate_sla(name: str, db: Session, start:str, end:str): #рассчет sla(костыльно - переписать)
 
     service_object = db.query(Service).filter(Service.name == name.capitalize()).first()
     if service_object is None:

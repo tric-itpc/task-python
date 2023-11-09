@@ -24,9 +24,10 @@ async def update(data:ServiceSchema.Service = None, name: str = None, db: Sessio
 async def get(service_name: str = None, db: Session = Depends(get_db)):
     return ServiceCrud.get_service_history(service_name, db)
 
-@router.get('/{state}', tags=(["service"]))
+@router.get('/{state}/', tags=(["service"]))
 async def get_services_by_state(state: str = None, db: Session = Depends(get_db)):
     return ServiceCrud.get_services_by_state(state, db)
+
 
 @router.get('/sla/{name}', tags=(["service"]), response_model=SLA_output)
 async def calculate_sla(name: str = None, start: str = None, end: str = None, db: Session = Depends(get_db)):

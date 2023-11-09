@@ -15,3 +15,12 @@ def calc_sum_downtime(query):
             counter += 1
             sum_not_stable = sum_not_stable + (i.time_not_working - cnst)
     return (sum_not_stable, counter)
+
+def add_objects(object, db):
+    try:
+        db.add(object)
+        db.commit()
+        db.refresh(object)
+
+    except Exception as e:
+        print(e)
