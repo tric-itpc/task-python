@@ -10,7 +10,7 @@ def test_service_create_correct():
    print(response.status_code)
 
 def test_service_create_incorrect():
-   response = client.post('/service/', json={"name": "Сервис1", "state": "работает"})
+   response = client.post('/service/', json={"name": "Сервис1", "state": "работает", "description": "string"})
    print(response.status_code)
 
 def test_get_services_by_state():

@@ -12,7 +12,7 @@ class ServiceHistory(BaseModel):
     from_state: str
     to_state: str
     change_time: datetime
-    time_not_working: datetime
+    time_not_working: str
 
 
 class SLA_output(BaseModel):

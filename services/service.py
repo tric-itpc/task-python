@@ -68,7 +68,7 @@ def calculate_sla(name: str, db: Session, start:str, end:str): #рассчет s
         raise HTTPException(status_code=400,
                             detail='Такого сервиса нет в базе')
 
-    if end<start:
+    if parser.parse(end)<parser.parse(start):
         raise HTTPException(status_code=400,
                             detail='Неверный временной отрезок')
 
@@ -77,8 +77,9 @@ def calculate_sla(name: str, db: Session, start:str, end:str): #рассчет s
     all_time = db.query(ServiceHistory).filter(ServiceHistory.service_name == name).all()
     sum_not_stable, downtimes_by_period = calc_sum_downtime(histories)
     sum_not_stable2, all_downtimes = calc_sum_downtime(all_time)
+    print(sum_not_stable, sum_not_stable2)
     if all_downtimes != 0:
-        s = (sum_not_stable2.total_seconds() - sum_not_stable.total_seconds()) / sum_not_stable2.total_seconds() * 100
+        s = (sum_not_stable2 - sum_not_stable) / sum_not_stable2 * 100
     else:
         s = 100
 

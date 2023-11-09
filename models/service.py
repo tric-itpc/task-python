@@ -16,6 +16,6 @@ class ServiceHistory(Base):
     from_state = Column(String, index=True)
     to_state = Column(String, index=True)
     change_time = Column(DateTime, index=True)
-    time_not_working = Column(DateTime, index=True)
+    time_not_working = Column(String, index=True)
 
 
