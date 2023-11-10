@@ -5,8 +5,8 @@ class Service(Base):
     __tablename__ = 'services'
     id = Column(Integer, primary_key = True, index = True)
     name = Column(String, unique=True, index=True)
-    state = Column(String, index=True, default="работает")
-    description = Column(String, index=True, default=None)
+    state = Column(String, index=True)
+    description = Column(String, index=True)
 
 
 class ServiceHistory(Base):
