@@ -1,0 +1,320 @@
+{
+	"info": {
+		"_postman_id": "b10ffa6c-1a06-49e0-811c-2a31a4a01018",
+		"name": "StatusHistory",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "22354635"
+	},
+	"item": [
+		{
+			"name": "Список сервисов",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:8000/api/services/",
+				"description": "Выводит список сервисов с актуальным состоянием"
+			},
+			"response": [
+				{
+					"name": "Пример response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:8000/api/services/"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sun, 12 Nov 2023 10:36:58 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "WSGIServer/0.2 CPython/3.7.9"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Cookie"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, POST, HEAD, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "677"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 7,\n        \"name\": \"СAPI2\",\n        \"status\": \"работает\",\n        \"description\": \"Создание сервиса через API\"\n    },\n    {\n        \"id\": 6,\n        \"name\": \"СAPI\",\n        \"status\": \"работает\",\n        \"description\": \"Создание сервиса через API\"\n    },\n    {\n        \"id\": 5,\n        \"name\": \"Fifth\",\n        \"status\": \"работает\",\n        \"description\": \"Очень крутой сервис\"\n    },\n    {\n        \"id\": 4,\n        \"name\": \"Fourth\",\n        \"status\": \"не работает\",\n        \"description\": \"Крутооооой\"\n    },\n    {\n        \"id\": 3,\n        \"name\": \"Third\",\n        \"status\": \"работает\",\n        \"description\": \"Ещё круче\"\n    },\n    {\n        \"id\": 2,\n        \"name\": \"Second\",\n        \"status\": \"работает\",\n        \"description\": \"Крутой\"\n    },\n    {\n        \"id\": 1,\n        \"name\": \"First\",\n        \"status\": \"работает\",\n        \"description\": \"Крут\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "История изменения состояния сервиса",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:8000/api/history/1/",
+				"description": "По имени сервиса выдает историю изменения состояния и все данные по каждому состоянию"
+			},
+			"response": [
+				{
+					"name": "Пример response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:8000/api/history/1/"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sun, 12 Nov 2023 10:36:36 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "WSGIServer/0.2 CPython/3.7.9"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Cookie"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, HEAD, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "440"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 8,\n        \"name\": \"First\",\n        \"service_id\": \"1\",\n        \"status\": \"работает\",\n        \"last_modified\": \"12.11.2023 12:05:52\"\n    },\n    {\n        \"id\": 7,\n        \"name\": \"First\",\n        \"service_id\": \"1\",\n        \"status\": \"нестабильно\",\n        \"last_modified\": \"12.11.2023 12:03:40\"\n    },\n    {\n        \"id\": 6,\n        \"name\": \"First\",\n        \"service_id\": \"1\",\n        \"status\": \"не работает\",\n        \"last_modified\": \"12.11.2023 12:02:37\"\n    },\n    {\n        \"id\": 1,\n        \"name\": \"First\",\n        \"service_id\": \"1\",\n        \"status\": \"работает\",\n        \"last_modified\": \"12.11.2023 11:59:14\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "SLA и общее время недоступности сервиса",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:8000/api/4/2023-11-11/2023-11-13/",
+				"description": "По указанному интервалу выдается информация о том сколько не работал сервис и рассчитывается SLA в процентах до 3-й запятой"
+			},
+			"response": [
+				{
+					"name": "Пример response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:8000/api/4/2023-11-11/2023-11-13/"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sun, 12 Nov 2023 10:35:09 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "WSGIServer/0.2 CPython/3.7.9"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Cookie"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "212"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"Информация для сервиса\": \"Fourth\",\n    \"Service level agreement(в процентах)\": 96.913,\n    \"Общее время недоступности сервиса(в секундах)\": \"5334.910411\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Создание сервиса",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"СAPI\",\r\n    \"description\": \"Создание сервиса через API\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:8000/api/services/"
+			},
+			"response": [
+				{
+					"name": "Пример response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"СAPI2\",\r\n    \"description\": \"Создание сервиса через API\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:8000/api/services/"
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sun, 12 Nov 2023 10:34:32 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "WSGIServer/0.2 CPython/3.7.9"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept, Cookie"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, POST, HEAD, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "115"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 7,\n    \"name\": \"СAPI2\",\n    \"status\": \"работает\",\n    \"description\": \"Создание сервиса через API\"\n}"
+				}
+			]
+		}
+	]
+}
