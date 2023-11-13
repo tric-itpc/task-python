@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .models import Service, StatusHistory
+from .scripts import seconds_to_time
 from .serializers import ServiceSerializer, StatusHistorySerializer
 
 
@@ -52,12 +53,13 @@ def sla_calculation(request, service_id, start_date, end_date):
     total_time = end_date - start_date
     availability = (total_time - total_downtime) / total_time
     sla = availability * 100
+    total = seconds_to_time(total_downtime.seconds)
 
     return Response(
         {
             'Информация для сервиса': Service.objects.get(id=service_id).name,
             'Service level agreement(в процентах)': round(sla, 3),
-            'Общее время недоступности сервиса(в секундах)': total_downtime
+            'Общее время недоступности сервиса': total
          },
         status=status.HTTP_200_OK
     )

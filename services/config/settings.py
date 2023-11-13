@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api.apps.ApiConfig',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -35,7 +37,9 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'api/docs'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,8 +85,6 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
 USE_L10N = True
@@ -90,8 +92,9 @@ USE_L10N = True
 TIME_ZONE = 'Europe/Moscow'
 USE_TZ = True
 
-
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'api/docs'),
+)
 STATIC_URL = '/static/'
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
