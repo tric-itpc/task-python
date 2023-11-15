@@ -1,0 +1,73 @@
+@baseUrl = http://localhost:8000
+
+# внесение нового сервиса
+POST {{baseUrl}}/service/
+Content-Type: application/json
+
+{
+  "name": "TestService3"
+}
+
+###
+
+# получение данных сервиса
+GET {{baseUrl}}/service/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "key": "6f1c9e9b-6b37-4f9e-b473-c310afcb70d0"
+}
+
+###
+
+# изменение данных сервиса
+PATCH {{baseUrl}}/service/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "key": "6f1c9e9b-6b37-4f9e-b473-c310afcb70d0",
+  "url": "https://www.djangoproject.com/",
+  "description": "Test description"
+}
+
+###
+
+# получение актуальной записи состояния сервиса
+GET {{baseUrl}}/state/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "key": "6f1c9e9b-6b37-4f9e-b473-c310afcb70d0"
+}
+
+###
+
+# внесение актуальной записи состояния сервиса
+POST {{baseUrl}}/state/
+Content-Type: application/json
+
+{
+  "id": 3,
+  "key": "d9320d6e-2922-46e7-a16a-e88f3dac9ea5",
+  "description": "No data",
+  "state": "Работает нестабильно"
+}
+
+###
+
+# просмотр всей истории записей статусов сервиса
+GET {{baseUrl}}/recording/all/?service=3
+
+Content-Type: application/json
+
+###
+
+# просмотр всего списка сервисов с актуальным статусом
+GET {{baseUrl}}/service/relevance/
+
+Content-Type: application/json
+
+###
