@@ -6,6 +6,10 @@ from db.db_connect import db
 from model.service import Service
 
 
+STATE_WORK = 'work'
+STATE_NOT_WORK = 'notwork'
+
+
 class ServiceRepo():
 
     @staticmethod
@@ -21,12 +25,12 @@ class ServiceRepo():
     async def get_actual_state_service():
         """ Выводит список сервисов с актуальным состоянием """
 
-        services = await db.service.distinct("name")
+        services = await db.service.distinct('name')
         list_services = []
         for service in services:
             actual_state = (
                 db.get_collection('service')
-                .find({"name": service})
+                .find({'name': service})
                 .sort('state_dt', pymongo.DESCENDING)
                 .limit(1)
             )
@@ -39,7 +43,7 @@ class ServiceRepo():
 
         states = (
             db.get_collection('service')
-            .find({"state": state})
+            .find({'state': state})
             .sort('state_dt', pymongo.DESCENDING)
         )
         list_state = []
@@ -53,7 +57,7 @@ class ServiceRepo():
 
         services = (
             db.get_collection('service')
-            .find({"name": name})
+            .find({'name': name})
             .sort('state_dt', pymongo.DESCENDING)
         )
         list_service = []
@@ -67,43 +71,41 @@ class ServiceRepo():
 
         services = (
             db.get_collection('service')
-            .find({"name": name, 'state_dt': {'$gt': date_start, '$lt': date_end}})
+            .find({'name': name, 'state_dt': {'$gt': date_start, '$lt': date_end}})
             .sort('state_dt', pymongo.DESCENDING)
         )
         previous_service = (
             db.get_collection('service')
-            .find({"name": name, 'state_dt': {'$lt': date_start}})
+            .find({'name': name, 'state_dt': {'$lt': date_start}})
             .sort('state_dt', pymongo.DESCENDING)
             .limit(1)
         )
-        _list_state = []
-        _list_states = []
+        list_state = []
         downtime = datetime.timedelta()
         downtime_end = None
         downtime_start = None
 
         async for service in previous_service:
-            if service["state"] == "nowork":
-                _list_state.append(service)
+            if service['state'] == STATE_NOT_WORK:
+                list_state.append(service)
 
         async for service in services:
-            _list_states.append(service)
-            if service["state"] == "nowork":
-                downtime_start = service["state_dt"]
+            if service['state'] == STATE_NOT_WORK:
+                downtime_start = service['state_dt']
                 if downtime_end:
                     downtime += downtime_end - downtime_start
                     downtime_end = None
-                else:
-                    downtime += date_end - downtime_start
-            elif service["state"] == "work":
-                downtime_end = service["state_dt"]
+                    continue
+                downtime += date_end - downtime_start
+            elif service['state'] == STATE_WORK:
+                downtime_end = service['state_dt']
 
-        if _list_state and downtime_end:
+        if list_state and downtime_end:
             downtime += downtime_end - date_start
-            _list_state.pop()
-        elif _list_state and downtime_start:
+            list_state.pop()
+        elif list_state and downtime_start:
             downtime += downtime_start - date_start
-            _list_state.pop()
+            list_state.pop()
 
         sla = get_formatted_sla(date_start, date_end, downtime)
         return sla
@@ -132,4 +134,4 @@ def get_formatted_sla(date_start: datetime.datetime, date_end: datetime.datetime
     """ Форматирование строки SLA """
 
     sla = ((date_end - date_start) - downtime) / (date_end - date_start) * 100
-    return "{0:.0f} hours".format(downtime.total_seconds() // 3600), "{0:.3f}%".format(sla)
+    return '{0:.0f} hours'.format(downtime.total_seconds() // 3600), '{0:.3f}%'.format(sla)
