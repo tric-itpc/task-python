@@ -1,0 +1,194 @@
+openapi: 3.0.2
+info:
+  title: 'StatusHistory'
+  version: ''
+paths:
+  /api/services/:
+    get:
+      description: 'Список сервисов.'
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Services'
+          description: ''
+      tags:
+        - Сервисы
+    post:
+      description: 'Создание сервиса.'
+      parameters:
+        - name: name
+          required: true
+          in: query
+          description: 'Название сервиса'
+          example: 'Крутой сервис'
+          schema:
+            type: string
+        - name: description
+          required: true
+          in: query
+          description: 'Описание сервиса'
+          example: 'Описание крутого сервиса'
+          schema:
+            type: string
+        - name: status
+          required: false
+          in: query
+          description: 'Статус работы сервиса'
+          example: 'работает'
+          schema:
+            default: 'работает'
+            type: string
+            enum: ['работает', 'не работает', 'нестабильно']
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+          description: ''
+      tags:
+        - Сервисы
+  /api/history/{service_id}/:
+    get:
+      description: 'История изменений состояния работы сервиса.'
+      parameters:
+        - name: service_id
+          required: true
+          in: path
+          description: 'ID сервиса'
+          example: 3
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/History'
+          description: ''
+      tags:
+        - История работы сервиса
+  /api/{service_id}/{start_date}/{end_date}/:
+    get:
+      description: 'Информация о том сколько не работал сервис и расчёт SLA.'
+      parameters:
+        - name: service_id
+          required: true
+          in: path
+          description: 'ID сервиса'
+          example: 4
+          schema:
+            type: integer
+        - name: start_date
+          required: true
+          in: path
+          description: 'Начало периода'
+          example: '2023-10-29'
+          schema:
+            type: string
+        - name: end_date
+          required: true
+          in: path
+          description: 'Конец периода'
+          example: '2023-11-13'
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Информация для сервиса:
+                    type: string
+                    description: 'Название сервиса'
+                    example: 'Fourth'
+                  Service level agreement(в процентах):
+                    type: integer
+                    description: 'SLA'
+                    example: '96.913'
+                  Общее время недоступности сервиса:
+                    type: string
+                    description: 'Общее время недоступности'
+                    example: '0 месяцев, 10 часов, 12 минут, 31 секунд'
+          description: ''
+      tags:
+        - Service level agreement
+
+components:
+  schemas:
+    Services:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          example: '1'
+        name:
+          type: string
+          maxLength: 100
+          description: 'Название'
+          example: 'СAPI2'
+        status:
+          type: string
+          maxLength: 50
+          description: 'Состояние'
+          example: 'работает'
+        description:
+          type: string
+          description: 'Описание'
+          example: 'Крутой сервис'
+    Service:
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+          readOnly: true
+          example: 2
+        name:
+          title: Название сервиса
+          type: string
+          example: "Крутой сервис"
+          maxLength: 100
+        status:
+          title: Статус работы сервиса
+          type: string
+          example: "работает"
+        description:
+          title: Опсиание сервиса
+          type: string
+          example: "Описание крутого сервиса"
+    History:
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+          readOnly: true
+          example: 1
+        name:
+          title: Название сервиса
+          type: string
+          example: "CAPI2"
+          maxLength: 100
+        service_id:
+          title: ID сервиса
+          type: string
+          example: 3
+        status:
+          title: Статус работы сервиса
+          type: string
+          example: "работает"
+        last_modified:
+          title: Дата последнего изменения работы сервиса
+          type: string
+          example: "12.11.2023 12:05:52"
