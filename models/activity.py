@@ -14,8 +14,8 @@ class ServiceStatus(str, Enum):
 
 class CurrentActivity(BaseModel):
     service_name: str = Field(example='Service_name')
-    status: ServiceStatus = Field(examle=ServiceStatus.ACTIVE)
-    description: str = Field(example='stable operation of the server')
+    status: ServiceStatus = Field(default=ServiceStatus.ACTIVE)
+    description: str = Field(example='Server is Active ')
 
 
 class ServicesList(CurrentActivity):
