@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  service_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: service_api
+    depends_on:
+      - mongo
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongo:27017/service_db
+      - DATABASE_NAME=service_db
+
+volumes:
+  mongo-data:
